@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Teacher dashboard · Earth Science Labs</title><link rel="stylesheet" href="assets/styles.css"><link rel="stylesheet" href="assets/classroom.css"><script defer src="assets/classroom-config.js"></script><script defer src="assets/classroom-client.js"></script><script defer src="assets/model.js"></script><script defer src="assets/teacher.js"></script></head><body>
+<a class="skip" href="#teacherPanel">Skip to classroom</a>
+<header><div class="brand">EARTH SCIENCE LABS / TEACHER</div><h1>Teach the step.<br>See the thinking.</h1><p>Your student's lab progress and your teaching guide, together.</p></header>
+<section id="teacherGate" class="panel wrap" style="margin-top:24px"><p id="teacherGateMessage" role="status">Checking your classroom access…</p><a href="classroom.html">Classroom sign in</a></section>
+<main id="teacherPanel" class="wrap" hidden>
+<div class="topline"><div><strong id="classLabel"></strong><div id="teacherIdentity" class="small"></div></div><div class="actions"><button id="refreshNow">Refresh progress</button><button id="teacherSignOut">Sign out</button></div></div>
+<div class="teacher-layout">
+<section class="panel" aria-labelledby="progressTitle"><p class="eyebrow">Student notebook</p><h2 id="progressTitle">See her progress</h2>
+<label for="studentSelect">Student</label><select id="studentSelect"><option value="">No students yet</option></select>
+<p class="saved-time" id="progressStatus" role="status">Waiting for saved work.</p>
+<div id="liveProgress"></div>
+<button id="teacherDownload" disabled>Download this student's work file</button>
+<details><summary>Add a student account</summary><p>Enter the exact email she will use to sign in. Use a classroom code for the display name.</p><form id="addStudentForm"><label for="studentEmail">Student sign-in email</label><input id="studentEmail" type="email" autocomplete="off" required maxlength="254"><label for="studentDisplay">Display code</label><input id="studentDisplay" required maxlength="80" placeholder="Student 01"><button class="primary" id="addStudent" type="submit" style="margin-top:14px">Allow this student account</button></form><p id="addStudentStatus" role="status"></p><p class="small">This assigns classroom access; it does not send an email. Google users can sign in with their approved account. A separate lab-password account must be created in the authentication administrator's dashboard.</p></details>
+</section>
+<section class="panel teacher-guide" aria-labelledby="guideTitle"><p class="eyebrow">Teacher guide</p><h2 id="guideTitle">One step at a time</h2>
+<div id="guideChoices" class="step-buttons" role="group" aria-label="Choose a teaching step"></div>
+<div class="note"><strong id="classStep">Class step: 1</strong><p class="small">Send the selected step when you are ready. Her existing answers stay in her notebook.</p><button id="sendStep" class="primary">Send student to this step</button><p id="sendStatus" role="status" class="teacher-status"></p></div>
+<div id="guideBody"></div>
+<details><summary>Full numeric answer key</summary><div class="scroll" id="answerKey" tabindex="0" role="region" aria-label="Balloon answer key"></div></details>
+<details><summary>Model limits and lab documentation</summary><p>This is a surface model. A is a reference galaxy, not a center of the universe. The assumed 8 model years are not instructional minutes. The activity supports part of HS-ESS1-2 and needs additional astronomical evidence for the full standard.</p><p><a href="https://github.com/jplutajr/earth-science-labs/blob/main/docs/TEACHER_GUIDE.md" target="_blank" rel="noopener">Full teacher guide and standards notes ↗</a></p><p>Your school determines acceptable laboratory documentation and credit.</p></details>
+</section>
+</div><footer>Progress refreshes about every 5 seconds. Counts show completed entries, not a mastery score. Review the student's explanation and record the support you provided.</footer></main>
+</body></html>

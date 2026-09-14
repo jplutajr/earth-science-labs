@@ -1,23 +1,27 @@
-/* Guided lab UI. No external services or student-data collection. */
-(function appMain(){
+/* Guided lab UI. Optional authenticated classroom storage is provided by the bridge. */
+(async function appMain(){
 "use strict";
+const bridge=await window.Classroom.start();if(!bridge)return;
+const cloud=bridge.mode==="cloud";
 const M=window.BalloonModel;
 const {LAB,IDS,TARGETS,VECTORS,ANSWERS,dot,distance,nearest,numberFrom,calculateRow,fresh,count,unlocked,restore}=M;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>Number.isFinite(n)?String(Number(n.toFixed(3))):"—";
 let state=fresh(),selected="B",tape=false,storageOK=true;
-try{const raw=localStorage.getItem(LAB.storage);if(raw)state=restore(JSON.parse(raw));}catch(e){storageOK=false;}
+if(cloud){if(bridge.initial)state=restore(bridge.initial);state.student=bridge.displayName;state.phase=bridge.teacherPhase;if(state.phase>0)state.marked=true;}
+else try{const raw=localStorage.getItem(LAB.storage);if(raw)state=restore(JSON.parse(raw));}catch(e){storageOK=false;}
 selected=nextGalaxy();
 function phaseDiameter(){return state.phase===0?10:state.phase===1?20:30;}
 function nextGalaxy(){if(state.phase===1||state.phase===2)return TARGETS.find(id=>state.measurements[phaseDiameter()][id]===undefined)||"B";if(state.phase===3)return TARGETS.find(id=>!state.math[id])||"B";return "B";}
 function announce(message,error=false){$("feedback").textContent=message;$("feedback").classList.toggle("error",error);}
 function save(){
+ if(cloud){bridge.enqueue(state);return;}
  try{localStorage.setItem(LAB.storage,JSON.stringify(state));storageOK=true;}catch(e){storageOK=false;}
  $("saveStatus").textContent=storageOK?"Saved on this device. Use a work file to move or back up your work.":"Browser saving is unavailable. Use Save work file before leaving.";
 }
 function nav(){
- const limit=unlocked(state);
+ const limit=cloud?Math.max(unlocked(state),bridge.teacherPhase):unlocked(state);
  document.querySelectorAll("[data-phase]").forEach(b=>{
   const p=Number(b.dataset.phase);b.disabled=p>limit;
   if(p===state.phase)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current");
@@ -27,8 +31,8 @@ function nav(){
  $("next").textContent=["Next: inflate to 20 cm →","Next: inflate to 30 cm →","Next: calculate →","Next: explain →",""][state.phase];
 }
 function go(p){
- if(p<0||p>unlocked(state)||p>4)return;
- state.phase=p;selected=nextGalaxy();tape=false;save();render();
+ if(p<0||p>(cloud?Math.max(unlocked(state),bridge.teacherPhase):unlocked(state))||p>4)return;
+ state.phase=p;if(cloud&&p>0)state.marked=true;selected=nextGalaxy();tape=false;save();render();
  $("stepHeading").focus({preventScroll:true});
  $("workspace").scrollIntoView({behavior:"auto",block:"start"});
 }
@@ -106,7 +110,9 @@ function measurementView(){
 function mathView(){
  choices("mathChoices",true);
  const a=state.measurements[20][selected],b=state.measurements[30][selected];
- $("mathData").innerHTML=`<strong>Galaxy ${selected}</strong><br>First distance: <strong>${a} cm</strong> &nbsp; Second distance: <strong>${b} cm</strong><br>Model time: <strong>8 years</strong>`;
+ $("mathData").innerHTML=`<strong>Galaxy ${selected}</strong><br>First distance: <strong>${fmt(a)} cm</strong> &nbsp; Second distance: <strong>${fmt(b)} cm</strong><br>Model time: <strong>8 years</strong>`;
+ const missing=a===undefined||b===undefined;$("saveMath").disabled=missing;
+ if(missing)$("mathData").innerHTML+="<p>Record both measurements for this galaxy in Steps 2 and 3 before checking this row.</p>";
  const row=state.draftMath[selected]||state.math[selected]||["","","",""];
  row.forEach((n,i)=>{$("math"+i).value=n;});
  $("mathProgress").textContent=`${Object.keys(state.math).length} of 9 calculation rows saved. Changing a saved row means you must check and save it again.`;
@@ -176,6 +182,7 @@ for(let i=0;i<4;i++)$("math"+i).addEventListener("input",()=>{
  save();$("completion").textContent="";
 });
 $("saveMath").addEventListener("click",()=>{
+ if(state.measurements[20][selected]===undefined||state.measurements[30][selected]===undefined){announce("Record this galaxy in Steps 2 and 3 first.",true);return;}
  const values=[0,1,2,3].map(i=>numberFrom($("math"+i).value));
  const expected=calculateRow(state.measurements[20][selected],state.measurements[30][selected]);
  const missing=values.findIndex(n=>n===null);
@@ -223,7 +230,7 @@ $("restoreFile").addEventListener("change",async e=>{
  try{
   const candidate=restore(JSON.parse(await file.text()));
   if(!window.confirm("Replace the work in this browser with this saved work file?"))return;
-  state=candidate;selected=nextGalaxy();tape=false;save();render();announce("Saved work opened. Continue where you left off.");
+  state=candidate;if(cloud){state.student=bridge.displayName;state.phase=bridge.teacherPhase;if(state.phase>0)state.marked=true;}selected=nextGalaxy();tape=false;save();render();announce("Saved work opened. Continue where you left off.");
  }catch(err){announce("That file could not be opened. Choose a compatible balloon work JSON file.",true);}
 });
 $("newStudent").addEventListener("click",()=>{
@@ -246,5 +253,11 @@ $("csv").addEventListener("click",()=>{
  for(const id of TARGETS)rows.push([id,state.measurements[20][id]??"",state.measurements[30][id]??"",...(state.math[id]||["","","",""])]);
  download(`balloon-data-${fileDate()}.csv`,rows.map(row=>row.join(",")).join("\r\n")+"\r\n","text/csv;charset=utf-8");
 });
+if(cloud){
+ bridge.bind({
+  replace(raw,phase){state=raw?restore(raw):fresh();state.student=bridge.displayName;state.phase=phase;if(phase>0)state.marked=true;selected=nextGalaxy();tape=false;render();},
+  phase(p){state.phase=p;if(p>0)state.marked=true;selected=nextGalaxy();tape=false;save();render();announce("Your teacher opened Step "+(p+1)+". Your earlier answers are saved.");}
+ });
+}
 save();render();
 })();

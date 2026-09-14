@@ -16,14 +16,21 @@ The lab uses model centimeters and an assumed 8-year interval. It does not measu
 
 Directions are divided into short steps. Students get a readable tape, rounding hints, a calculator, sentence starters, and editable responses. Incorrect measurements receive hints. The app does not fill the data table automatically.
 
+## Teacher and student accounts
+
+[Classroom sign in](https://jplutajr.github.io/earth-science-labs/classroom.html) supports Google sign-in and separate lab-password accounts after backend setup. The teacher dashboard contains progress, responses, the guide, and a control to send students to a selected step. Students reopen their own saved work.
+
+**Connection status:** account features remain disabled in the public config until the authentication project is connected. See [classroom setup](docs/CLASSROOM_SETUP.md). The existing practice lab works independently.
+
 ## Save student work
 
-Work saves in the current browser when local storage is available. **Save work file** downloads a JSON backup; **Open work file** restores it. Reports download as HTML, data as CSV, and the browser print dialog can save a PDF. On shared devices, save a backup and use **Start over**.
+In practice mode, work saves in the current browser when local storage is available. In classroom mode, work saves to the authenticated account and is shared with its assigned teacher. **Save work file** downloads a JSON backup; **Open work file** restores it. Reports download as HTML, data as CSV, and the browser print dialog can save a PDF. On shared devices, save a backup and use **Start over**.
 
-There are no accounts, analytics, external scripts, or server uploads of student responses. GitHub Pages hosts the site; normal hosting requests remain subject to GitHub's privacy practices. The student code is optional. No private educational records or licensed curriculum files are included in this repository.
+The practice lab needs no account and sends no student responses to a server. Configured classroom accounts use Supabase Auth and database storage; only assigned classroom users can access the records. There are no analytics or external frontend scripts. GitHub Pages hosts the site; normal hosting requests remain subject to GitHub's privacy practices. The student code is optional. No private educational records or licensed curriculum files are included in this repository.
 
 ## For adults and contributors
 
+- [Classroom setup and Google sign-in](docs/CLASSROOM_SETUP.md)
 - [Teacher guide and answer key](docs/TEACHER_GUIDE.md)
 - [Deployment and development](docs/DEPLOYMENT.md)
 - [Plan for future labs](docs/FUTURE_LABS.md)

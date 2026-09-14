@@ -7,7 +7,11 @@
 <meta name="app-version" content="1.0.0">
 <title>Expanding Universe · Earth Science Labs</title>
 <link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/classroom.css">
 <script defer src="assets/model.js"></script>
+<script defer src="assets/classroom-config.js"></script>
+<script defer src="assets/classroom-client.js"></script>
+<script defer src="assets/classroom.js"></script>
 <script defer src="assets/app.js"></script>
 </head>
 <body>
@@ -18,10 +22,13 @@
 <p>Explore the balloon model of the expanding universe. Measure, find a pattern, and use your data to explain it.</p>
 </header>
 <noscript><p class="noscript">Please turn on JavaScript to use this simulator. Your teacher can help with your browser settings.</p></noscript>
-<main class="wrap" id="workspace">
+<section class="panel" id="classroomGate" hidden><p id="classroomGateMessage" role="status">Opening your classroom notebook…</p><a href="classroom.html">Return to sign in</a></section>
+<div id="classroomBar" class="classroom-bar" hidden><div class="wrap"><div><strong id="classroomIdentity"></strong><p id="teacherStepLabel"></p><p id="cloudStatus" role="status" class="small"></p></div><div class="account-actions"><button id="joinTeacherStep" hidden>Go to teacher's step</button><button id="reloadCloud" hidden>Reopen saved classroom work</button><button id="studentSignOut">Sign out</button></div></div></div>
+<main class="wrap" id="workspace"><p id="practiceLabel" class="note" hidden><strong>Practice mode.</strong> This notebook saves on this device. It does not send work to the teacher.</p>
 <div class="topline">
 <div><strong>Your lab notebook</strong><div id="saveStatus" role="status">Getting your notebook ready…</div></div>
 <div class="actions">
+<a href="classroom.html" id="classroomSignIn" class="signin-link">Classroom sign in</a>
 <button id="backup" class="subtle">Save work file</button>
 <button id="restoreButton" class="subtle">Open work file</button>
 <button id="newStudent" class="subtle">Start over</button>
@@ -123,11 +130,11 @@
 </section>
 <details>
 <summary>Save or hand in your work</summary>
-<p><strong>Your work stays in this browser.</strong> It is not sent to a teacher or server. On a shared device, save a work file and then use Start over when you are finished.</p>
+<p id="storageHelp"><strong>Practice work stays in this browser.</strong> In a classroom account, work also saves to your teacher’s classroom. Use a work file as a backup. Sign out on shared devices.</p>
 <ul><li><strong>Save work file</strong> lets you resume on another device using Open work file.</li><li><strong>Download report</strong> saves a readable HTML notebook you can open, print, or share with your teacher.</li><li><strong>Print / PDF</strong> opens your browser's print dialog. Choose Save as PDF if available.</li><li><strong>Download data</strong> saves a CSV file for a spreadsheet.</li></ul>
 <div class="actions"><button id="report">Download report</button><button id="print">Print / PDF</button><button id="csv">Download data (CSV)</button></div>
 </details>
-<details>
+<details id="teacherDetails">
 <summary>For the teacher · key, sources &amp; lab use</summary>
 <p>Designed for one student with no physical supplies. Offer read-aloud directions, short sessions, a calculator, and oral responses as appropriate. Save the student's own observations and reasoning.</p>
 <p><a href="https://github.com/jplutajr/earth-science-labs/blob/main/docs/TEACHER_GUIDE.md" target="_blank" rel="noopener">Open the teacher guide and answer key ↗</a></p>
@@ -138,7 +145,7 @@
 <li><a href="https://www.nysed.gov/standards-instruction/science-faq" target="_blank" rel="noopener">NYSED: Science FAQ and laboratory guidance ↗</a></li>
 </ul>
 </details>
-<footer>Earth Science Labs · Balloon model v1.0 · No account needed. No student responses are uploaded. <a href="https://github.com/jplutajr/earth-science-labs" target="_blank" rel="noopener">Code &amp; future labs ↗</a></footer>
+<footer>Earth Science Labs · Balloon model v1.1 · Practice works without an account. Classroom accounts share saved work with the assigned teacher. <a href="https://github.com/jplutajr/earth-science-labs" target="_blank" rel="noopener">Code &amp; future labs ↗</a></footer>
 </main>
 <div id="printArea"></div>
 </body></html>

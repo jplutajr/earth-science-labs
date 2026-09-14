@@ -1,7 +1,7 @@
 name: Lab checks
 on:
   push:
-    branches: [main]
+    branches: [main, 'feature/**']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -10,6 +10,18 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 12
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: lab-ci-only
+          POSTGRES_DB: lab_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,6 +33,15 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Check model
         run: npm run test:model
+      - name: Check authentication client
+        run: npm run test:auth
+      - name: Check classroom database permissions
+        env:
+          PGPASSWORD: lab-ci-only
+        run: |
+          psql -h 127.0.0.1 -U postgres -d lab_ci -v ON_ERROR_STOP=1 -f backend/tests/bootstrap.sql
+          psql -h 127.0.0.1 -U postgres -d lab_ci -v ON_ERROR_STOP=1 -f backend/001_classroom.sql
+          psql -h 127.0.0.1 -U postgres -d lab_ci -v ON_ERROR_STOP=1 -f backend/tests/access.sql
       - name: Check student workflow and layout
         run: npm run test:browser
       - name: Verify published GitHub Pages site

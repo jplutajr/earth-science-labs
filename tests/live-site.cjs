@@ -2,7 +2,7 @@
 const fs=require("node:fs/promises"),assert=require("node:assert/strict"),{chromium}=require("@playwright/test");
 (async()=>{
  const base="https://jplutajr.github.io/earth-science-labs/";
- const paths=["index.html","assets/model.js","assets/app.js","assets/styles.css"];
+ const paths=["index.html","assets/model.js","assets/app.js","assets/styles.css","classroom.html","teacher.html","assets/classroom-config.js","assets/classroom.js","assets/classroom-client.js","assets/login.js","assets/teacher.js"];
  const expected=Object.fromEntries(await Promise.all(paths.map(async p=>[p,await fs.readFile(p,"utf8")])));
  let ready=false,last="";
  for(let attempt=0;attempt<24;attempt++){
@@ -20,7 +20,7 @@ const fs=require("node:fs/promises"),assert=require("node:assert/strict"),{chrom
  const browser=await chromium.launch();
  try{
   const page=await browser.newPage();const errors=[];page.on("pageerror",e=>errors.push(e.message));
-  await page.goto(base+"?verify="+process.env.GITHUB_SHA);
+  await page.goto(base+"?practice=1&verify="+process.env.GITHUB_SHA);
   await page.locator("#mark").click();
   await page.locator("#prediction").selectOption("increase");
   await page.locator("#why").fill("The surface stretches.");

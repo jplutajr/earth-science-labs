@@ -2,7 +2,7 @@
 
 ## GitHub Pages
 
-This repository is a static site. It has no production dependencies, server, or build command.
+The frontend is a static site with no build command. Optional classroom accounts use a separate Supabase backend; see [Classroom setup](CLASSROOM_SETUP.md).
 
 1. In this repository, open **Settings → Pages**.
 2. Under **Build and deployment**, choose **Deploy from a branch**.
@@ -32,10 +32,13 @@ The developer-only test dependency is Playwright. Node 22 and Python 3 are used 
 npm install --ignore-scripts --no-audit --no-fund
 npx playwright install --with-deps chromium
 npm run test:model
+npm run test:auth
 npm run test:browser
 ```
 
 Model tests check geodesic measurements, scaling, rounding, calculations, and safe state restoration. Browser tests complete the lab, reject incomplete entries, exercise downloads and reopening work, confirm math edits invalidate saved results, and check keyboard access and mobile overflow. Pushes to main also verify the deployed HTML, scripts, and styles against the current commit and complete a measurement on the live site. Screenshots are saved as test artifacts. Browser test logs also include small visual-review images without student information.
+
+The GitHub workflow also runs the migration and access checks against a disposable PostgreSQL service. To run those checks locally, apply the files in backend/tests/bootstrap.sql, backend/001_classroom.sql, then backend/tests/access.sql to a dedicated disposable database; never run the test bootstrap against production.
 
 Before classroom use, open the site on the school's actual browser and try a measurement, work-file download, reopen, and print. Storage or downloads may be restricted by school settings.
 

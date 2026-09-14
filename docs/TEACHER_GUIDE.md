@@ -6,7 +6,7 @@ This simulator provides an individual investigation when a class has too few stu
 
 It is an independent implementation of a common balloon expansion model. The protocol below is the protocol implemented here; compare it with your licensed Hallock worksheet before assigning exact question numbers. This site does not distribute or claim to reproduce the commercial worksheet, video, or answer key.
 
-Use an optional student code rather than a full name. Student responses stay in the browser unless the user downloads and shares them. Save a work file before clearing data or changing devices.
+Use an optional student code rather than a full name. In practice mode, responses stay in the browser unless shared by download. With classroom accounts configured, saved work is shared with the assigned teacher. See [Classroom setup](CLASSROOM_SETUP.md). Save a work file before clearing data or changing devices.
 
 ## Procedure and supports
 
@@ -18,7 +18,7 @@ Use an optional student code rather than a full name. Student responses stay in 
 | 4 · Calculate | Subtract first from second; divide by 8 model years; multiply that rate by 24 and 32. | Use the built-in calculator, written formulas, and a short break between rows. Preserve all nine comparisons. |
 | 5 · Explain | Compare two galaxies and connect the pattern to expansion, then identify a limitation. | Use sentence frames, device dictation, or scribe the student's own oral explanation. |
 
-There is no timer and no automatic submission. Use short sessions and return to saved work. All directions are visual; sound is not required. Controls work with a keyboard. The chart's exact numbers are available in the table. Teacher response checks are still necessary: the app checks numeric entries but does not grade written scientific reasoning.
+There is no timer. Classroom accounts save to the teacher’s dashboard automatically; practice mode uses local work files. Use short sessions and return to saved work. All directions are visual; sound is not required. Controls work with a keyboard. The chart's exact numbers are available in the table. Teacher response checks are still necessary: the app checks numeric entries but does not grade written scientific reasoning.
 
 The 10 cm balloon is a setup stage, not a third data-collection stage. The graph plots **distance at the 20 cm stage** on x and **model rate** on y. The final two columns are **additional motion over a duration at a constant rate**, not total distance from A and not observed future astronomical data.
 
