@@ -44,6 +44,9 @@ jobs:
           psql -h 127.0.0.1 -U postgres -d lab_ci -v ON_ERROR_STOP=1 -f backend/tests/access.sql
       - name: Check student workflow and layout
         run: npm run test:browser
+      - name: Verify public backend connection and anonymous access denial
+        if: github.event_name == 'push'
+        run: node tests/live-backend.cjs
       - name: Verify published GitHub Pages site
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: node tests/live-site.cjs

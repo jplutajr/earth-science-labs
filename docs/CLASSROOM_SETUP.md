@@ -1,6 +1,28 @@
 # Classroom account setup
 
-This release adds teacher and student views. Account features remain disabled until a Supabase project and its public connection settings are configured. The independent practice lab remains available.
+The site is connected to **Earth Science Labs**, a Supabase Free-plan project in the approved organization. The classroom migration is applied and the approved teacher email is registered privately. **Google provider configuration and the first real-account sign-in are still pending.** Teacher registration is not the same as creating an authenticated user.
+
+The Supabase dashboard owner's email may differ from the teacher's sign-in email. The verified app email must match the private teacher roster.
+
+The root page opens the practice lab for guests. Signed-in students open their own classroom notebook; teachers open their dashboard. No practice answers are uploaded automatically.
+
+**Budget: $0.** Keep this project on Supabase Free and the existing GitHub Pages site. Do not enable paid upgrades, custom domains, compute upgrades, or other add-ons. Free projects may pause after inactivity; restore the project from Supabase when needed. See current [Supabase pricing](https://supabase.com/pricing).
+
+## Finish this project's Google connection
+
+The database, private teacher registration, and public site connection below are already complete for this deployment. Do not rerun the teacher registration or recreate the project. Complete section 3A using these exact public settings:
+
+| Setting | Value |
+| --- | --- |
+| Supabase project | `uiadruwqzrcrwndvbrlk` |
+| Google authorized JavaScript origin | `https://jplutajr.github.io` |
+| Google authorized redirect URI | `https://uiadruwqzrcrwndvbrlk.supabase.co/auth/v1/callback` |
+| Supabase Auth Site URL | `https://jplutajr.github.io/earth-science-labs/` |
+| Supabase Auth allowed redirect URL | `https://jplutajr.github.io/earth-science-labs/classroom.html` |
+
+Open the [Google Auth Platform](https://console.cloud.google.com/auth/overview) to create the Web application OAuth client. Enter its client ID and client secret directly into the Google provider settings in the [Supabase project dashboard](https://supabase.com/dashboard/project/uiadruwqzrcrwndvbrlk), under Authentication. Configure URL settings as shown above. The connector used to prepare this release cannot create Google OAuth credentials or edit provider settings.
+
+Once saved, reload [Classroom sign in](https://jplutajr.github.io/earth-science-labs/classroom.html). The page detects the enabled Google provider automatically; no new code deployment is needed. Provider availability alone does not verify the client credentials, callback URLs, school policy, or a successful sign-in. Complete the real-account checks below.
 
 ## What it does
 
@@ -34,7 +56,7 @@ The first verified sign-in matching that email creates the teacher profile and c
 
 Follow the current [Supabase Google setup guide](https://supabase.com/docs/guides/auth/social-login/auth-google).
 
-1. Create or use the school's Google Cloud project and configure the OAuth consent screen/audience.
+1. Create or use the school's Google Cloud project and configure the OAuth consent screen/audience. Use **Internal** only if all intended users belong to that Workspace organization and the option is available. For an External app in Testing, add the exact teacher and student Google accounts as test users before sign-in. Use only the basic identity scopes listed below.
 2. Create an OAuth client of type **Web application**.
 3. Add the authorized JavaScript origin: `https://jplutajr.github.io`.
 4. Add the exact Supabase callback shown in the project's Google provider settings, typically `https://PROJECT_REF.supabase.co/auth/v1/callback`.
@@ -62,7 +84,7 @@ Edit `assets/classroom-config.js`:
 ```js
 window.CLASSROOM_CONFIG = Object.freeze({
   enabled: true,
-  googleEnabled: true, // only after the Google provider has been configured
+  googleEnabled: "auto", // checks the public Auth settings before showing Google
   supabaseUrl: "https://YOUR_PROJECT_REF.supabase.co",
   publishableKey: "sb_publishable_YOUR_PUBLIC_KEY"
 });
@@ -70,7 +92,7 @@ window.CLASSROOM_CONFIG = Object.freeze({
 
 A legacy Supabase anon key is also supported. **Never use a service-role or secret key.** The application requires the database authorization rules; a public key does not grant classroom access by itself.
 
-Push the config change and wait for the Pages deployment. Sign in at `classroom.html` using the approved teacher account. Use **Add a student account** to register the exact student email and a classroom display code.
+For a new deployment, push the config change and wait for Pages. This project's public config is already connected. Sign in at `classroom.html` using the approved teacher account. Use **Add a student account** to register the exact student email and a classroom display code.
 
 ## 5. Check the real accounts
 
@@ -95,6 +117,15 @@ Practice mode uses the original device-local notebook. It never automatically im
 The teacher dashboard's key is separated from the normal student interface. This is an open-source simulation: formulas and the older teacher guide are publicly available in the repository. Login protects student records; it does not make the model's numerical answers secret.
 
 For deletion, the administrator can remove an authentication user or the associated classroom data; foreign-key cascades remove dependent lab records. Account and classroom deletion should be planned before execution.
+
+## Database advisor review
+
+This schema deliberately denies all direct table access and exposes a small set of checked RPC functions. Supabase's security advisor reports two categories that require understanding this design:
+
+- [RLS enabled without policies](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy): intentional deny-all behavior on the five classroom/roster tables. Do not add broad policies to silence the notice.
+- [Authenticated SECURITY DEFINER function access](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable): intentional for the six application RPCs. Each function validates the current user, role, and classroom; all use an empty search path and grant no anonymous execution.
+
+The live database was checked for enabled RLS and no direct anonymous/authenticated table privileges. CI verifies role isolation, stale-write protection, and cross-class denials against disposable PostgreSQL data. A separate read-only production probe checks that public Auth settings are reachable and anonymous requests for classroom context or progress are denied. These checks do not authenticate as a real teacher or student.
 
 ## Sources
 

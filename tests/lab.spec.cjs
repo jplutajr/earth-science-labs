@@ -2,6 +2,7 @@
 const {test,expect}=require("@playwright/test");
 const fs=require("node:fs/promises");
 const M=require("../assets/model.js");
+test.beforeEach(async({page})=>{await page.route("**/assets/classroom-config.js",r=>r.fulfill({contentType:"application/javascript",body:"window.CLASSROOM_CONFIG={enabled:false};"}));});
 async function setup(page){
  await page.goto("/");
  await page.locator("#mark").click();

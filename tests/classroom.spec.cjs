@@ -94,7 +94,32 @@ test("offline saves recover and stale-device writes require an explicit reload",
  await expect(p.locator("#measureProgress")).toContainText("1 of 9");await c.close();
 });
 test("an unconfigured deployment clearly states accounts are not connected",async({page})=>{
+ await page.route("**/assets/classroom-config.js",r=>r.fulfill({contentType:"application/javascript",body:"window.CLASSROOM_CONFIG={enabled:false};"}));
  await page.goto("/classroom.html");await expect(page.locator("#notConnected")).toBeVisible();await expect(page.locator("#loginForm")).toBeHidden();
  await page.goto("/teacher.html");await expect(page.locator("#teacherGateMessage")).toContainText("not connected");await expect(page.locator("#teacherPanel")).toBeHidden();
+});
+
+test("guests keep the practice lab while connected accounts remain separate",async({browser})=>{
+ const b=backend(),c=await browser.newContext();await b.attach(c);const p=await c.newPage();
+ await p.goto("/");await expect(p.locator("#workspace")).toBeVisible();
+ await expect(p.locator("#practiceLabel")).toBeVisible();
+ await p.locator("#mark").click();await expect(p.locator("#classroomBar")).toBeHidden();
+ expect(b.records.student.revision).toBe(0);expect(b.records.other.revision).toBe(0);
+ await c.close();
+});
+test("Google availability follows provider settings and handles a network outage",async({page})=>{
+ let available=false,offline=false,requests=0;
+ await page.route("**/assets/classroom-config.js",r=>r.fulfill({contentType:"application/javascript",body:'window.CLASSROOM_CONFIG={enabled:true,googleEnabled:"auto",supabaseUrl:"https://classroom-test.supabase.co",publishableKey:"sb_publishable_test"};'}));
+ await page.route("https://classroom-test.supabase.co/**",async r=>{
+  requests++;expect(r.request().method()).toBe("GET");expect(new URL(r.request().url()).pathname).toBe("/auth/v1/settings");
+  expect(r.request().headers().apikey).toBe("sb_publishable_test");
+  if(offline){await r.abort();return;}
+  await r.fulfill({contentType:"application/json",body:JSON.stringify({external:{google:available}})});
+ });
+ await page.goto("/classroom.html");await expect(page.locator("#googlePendingMessage")).toContainText("being set up");
+ await expect(page.locator("#googleArea")).toBeHidden();await expect(page.locator("#loginForm")).toBeVisible();
+ available=true;await page.reload();await expect(page.locator("#googleSignIn")).toBeVisible();await expect(page.locator("#googlePending")).toBeHidden();
+ offline=true;await page.reload();await expect(page.locator("#googlePendingMessage")).toContainText("unavailable right now");await expect(page.locator("#googleArea")).toBeHidden();
+ expect(requests).toBe(3);
 });
 })();

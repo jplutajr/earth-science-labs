@@ -10,7 +10,7 @@ window.Classroom={async start(){
  }
  $("workspace").hidden=true;$("classroomGate").hidden=false;
  const api=new window.ClassroomClient(config);
- if(!api.session){location.replace("classroom.html");return null;}
+ if(!api.session){$("workspace").hidden=false;$("classroomGate").hidden=true;$("practiceLabel").hidden=false;return {mode:"practice"};}
  try{
   const context=await api.context();
   if(context?.profile?.role==="teacher"){location.replace("teacher.html");return null;}

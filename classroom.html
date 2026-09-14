@@ -5,8 +5,9 @@
 <section class="panel"><p class="eyebrow">Classroom access</p><h2>Sign in</h2>
 <p id="loginIntro">Use your assigned Google account or your separate lab email and password.</p>
 <div id="notConnected" class="note" hidden><strong>Classroom sign-in is not connected yet.</strong><p>The practice lab is available below. Your teacher is setting up classroom accounts.</p></div>
+<div id="googlePending" class="note" role="status" hidden><strong>Google sign-in</strong><p id="googlePendingMessage">Google sign-in is being set up. You can use the practice lab below.</p></div>
 <div id="googleArea" hidden><button id="googleSignIn" type="button" style="width:100%;margin:12px 0">Sign in with Google</button><p class="small">Use your assigned school Google account. You do not enter your Google password on this site.</p><hr></div>
-<form id="loginForm"><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username" required maxlength="254" spellcheck="false"><label for="loginPassword">Lab password</label><input id="loginPassword" type="password" autocomplete="current-password" required><button class="primary" id="signInButton" type="submit" style="margin-top:18px">Sign in</button></form>
+<form id="loginForm"><p class="small">For a separate lab account, use the lab password provided by your teacher. Your Google password is entered only on Google.</p><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username" required maxlength="254" spellcheck="false"><label for="loginPassword">Lab password</label><input id="loginPassword" type="password" autocomplete="current-password" required><button class="primary" id="signInButton" type="submit" style="margin-top:18px">Sign in</button></form>
 <p id="loginStatus" role="status" aria-live="polite"></p><p class="small">Need an account or a password reset? Ask the teacher or classroom administrator. Accounts are assigned; there is no public sign-up.</p>
 <a href="index.html?practice=1">Open the practice lab</a></section>
 <section class="panel"><p class="eyebrow">One lab · Two views</p><h2>What opens after sign-in?</h2>

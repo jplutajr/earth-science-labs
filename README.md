@@ -20,7 +20,9 @@ Directions are divided into short steps. Students get a readable tape, rounding 
 
 [Classroom sign in](https://jplutajr.github.io/earth-science-labs/classroom.html) supports Google sign-in and separate lab-password accounts after backend setup. The teacher dashboard contains progress, responses, the guide, and a control to send students to a selected step. Students reopen their own saved work.
 
-**Connection status:** account features remain disabled in the public config until the authentication project is connected. See [classroom setup](docs/CLASSROOM_SETUP.md). The existing practice lab works independently.
+**Connection status:** the site is connected to a Supabase Free-plan project, the classroom database is installed, and the approved teacher email is registered privately. Google provider setup and the first real-account sign-in are still pending. The sign-in page checks provider availability and displays the Google button once enabled. See [classroom setup](docs/CLASSROOM_SETUP.md). Guests can continue using the practice lab.
+
+**Budget: $0.** Keep GitHub Pages and Supabase on their free plans. No paid upgrades, custom domains, or add-ons are needed for this implementation. Free-plan limits and inactivity pauses still apply; see [Supabase pricing](https://supabase.com/pricing).
 
 ## Save student work
 

@@ -1,9 +1,21 @@
 (function loginMain(){
 "use strict";
 const $=id=>document.getElementById(id),config=window.CLASSROOM_CONFIG,Client=window.ClassroomClient;
-if(!Client.configured(config)){$("notConnected").hidden=false;$("loginForm").hidden=true;return;}
+if(!Client.configured(config)){$("notConnected").hidden=false;$("loginForm").hidden=true;$("loginIntro").hidden=true;return;}
 const api=new Client(config);
-$("googleArea").hidden=!config.googleEnabled;
+function showGoogle(ready,message){
+ $("googleArea").hidden=!ready;$("googleSignIn").disabled=!ready;
+ $("googlePending").hidden=ready;
+ $("loginIntro").textContent=ready?"Use your assigned Google account or your separate lab email and password.":"Use your separate lab login if your teacher has created one.";
+ if(message)$("googlePendingMessage").textContent=message;
+}
+if(config.googleEnabled==="auto"){
+ showGoogle(false,"Checking Google sign-in…");
+ fetch(config.supabaseUrl+"/auth/v1/settings",{headers:{apikey:config.publishableKey},signal:AbortSignal.timeout(8000)})
+ .then(response=>{if(!response.ok)throw Error("Unavailable");return response.json();})
+ .then(settings=>showGoogle(settings.external?.google===true,"Google sign-in is being set up. You can use the practice lab below."))
+ .catch(()=>showGoogle(false,"Google sign-in is unavailable right now. Reload to try again, or open the practice lab below."));
+}else showGoogle(config.googleEnabled===true);
 async function route(){
  const context=await api.context();
  if(!context?.profile||!context?.classroom)throw Error("This account has not been assigned to a classroom. Ask your teacher to finish the setup.");
