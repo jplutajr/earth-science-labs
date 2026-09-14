@@ -23,6 +23,9 @@ jobs:
         run: npm run test:model
       - name: Check student workflow and layout
         run: npm run test:browser
+      - name: Verify published GitHub Pages site
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: node tests/live-site.cjs
       - name: Save browser review artifacts
         if: always()
         uses: actions/upload-artifact@v4

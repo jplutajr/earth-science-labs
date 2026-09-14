@@ -35,7 +35,7 @@ npm run test:model
 npm run test:browser
 ```
 
-Model tests check geodesic measurements, scaling, rounding, calculations, and safe state restoration. Browser tests complete the lab, reject incomplete entries, exercise downloads and reopening work, confirm math edits invalidate saved results, and check keyboard access and mobile overflow. Screenshots are saved as test artifacts. Browser test logs also include small visual-review images without student information.
+Model tests check geodesic measurements, scaling, rounding, calculations, and safe state restoration. Browser tests complete the lab, reject incomplete entries, exercise downloads and reopening work, confirm math edits invalidate saved results, and check keyboard access and mobile overflow. Pushes to main also verify the deployed HTML, scripts, and styles against the current commit and complete a measurement on the live site. Screenshots are saved as test artifacts. Browser test logs also include small visual-review images without student information.
 
 Before classroom use, open the site on the school's actual browser and try a measurement, work-file download, reopen, and print. Storage or downloads may be restricted by school settings.
 
