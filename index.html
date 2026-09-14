@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A guided virtual balloon lab: measure galaxy distances, calculate expansion rates, and explain the evidence.">
+<meta name="app-version" content="1.0.0">
+<title>Expanding Universe · Earth Science Labs</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script defer src="assets/model.js"></script>
+<script defer src="assets/app.js"></script>
+</head>
+<body>
+<a class="skip" href="#workspace">Skip to the lab</a>
+<header>
+<div class="brand">EARTH SCIENCE LABS / ASTRONOMY 01</div>
+<h1>A universe of<br>growing space.</h1>
+<p>Explore the balloon model of the expanding universe. Measure, find a pattern, and use your data to explain it.</p>
+</header>
+<noscript><p class="noscript">Please turn on JavaScript to use this simulator. Your teacher can help with your browser settings.</p></noscript>
+<main class="wrap" id="workspace">
+<div class="topline">
+<div><strong>Your lab notebook</strong><div id="saveStatus" role="status">Getting your notebook ready…</div></div>
+<div class="actions">
+<button id="backup" class="subtle">Save work file</button>
+<button id="restoreButton" class="subtle">Open work file</button>
+<button id="newStudent" class="subtle">Start over</button>
+<input id="restoreFile" type="file" accept=".json,application/json" hidden aria-label="Choose a saved balloon work file">
+</div>
+</div>
+<nav aria-label="Lab steps">
+<button data-phase="0" aria-current="step">1 · Predict</button>
+<button data-phase="1" disabled>2 · Measure at 20 cm</button>
+<button data-phase="2" disabled>3 · Measure at 30 cm</button>
+<button data-phase="3" disabled>4 · Calculate</button>
+<button data-phase="4" disabled>5 · Explain</button>
+</nav>
+<div class="grid">
+<section class="visual" aria-label="Balloon model">
+<div class="visual-head"><span>VIRTUAL BALLOON</span><strong id="diameterBadge">10 cm diameter</strong></div>
+<svg id="balloon" viewBox="0 0 720 600" role="img" aria-labelledby="balloonTitle balloonDesc"></svg>
+<div class="legend">
+<p><strong>A = our reference galaxy.</strong> Each labeled dot represents a galaxy on the balloon's surface.</p>
+<p id="modelCaption">First, add your galaxy markers. Then predict what will happen when the balloon grows.</p>
+</div>
+</section>
+<section class="panel" aria-labelledby="stepHeading">
+<p class="eyebrow" id="stepEyebrow">Step 1 of 5 · Set up</p>
+<h2 id="stepHeading" tabindex="-1">Make a prediction</h2>
+<div id="predictPanel">
+<p>The balloon's <strong>surface</strong> represents space. You will measure how far the other galaxies are from A.</p>
+<ol class="step-list"><li>Press <strong>Add galaxy markers</strong>.</li><li>Choose what you think will happen.</li><li>Tell why. A short answer is enough.</li></ol>
+<button id="mark" class="primary">Add galaxy markers A–J</button>
+<label for="student">Student code (optional)</label>
+<input id="student" maxlength="60" autocomplete="off" placeholder="Use initials or a classroom code">
+<label for="prediction">When the balloon grows, distances from A will…</label>
+<select id="prediction"><option value="">Choose your prediction</option><option value="increase">increase — get larger</option><option value="decrease">decrease — get smaller</option><option value="same">stay the same</option></select>
+<label for="why">Why do you think so?</label>
+<textarea id="why" maxlength="2000" placeholder="I think the distances will ___ because ___."></textarea>
+<p class="small">A prediction can be different from your final answer. We learn by checking it.</p>
+</div>
+<div id="measurePanel" hidden>
+<p id="measureIntro"></p>
+<ol class="step-list"><li>Choose a galaxy below.</li><li>Press <strong>Lay measuring tape</strong>.</li><li>Read the distance. Round to the nearest whole cm.</li><li>Type your measurement and press <strong>Record</strong>.</li></ol>
+<div class="galaxies" id="measureChoices" role="group" aria-label="Choose a galaxy to measure"></div>
+<button id="layTape" class="primary">Lay measuring tape: A → B</button>
+<div class="readout">
+<span id="readingLabel">Surface distance from A to B</span>
+<output id="reading" aria-live="polite">Lay the tape to measure.</output>
+<svg id="ruler" viewBox="0 0 500 86" role="img" aria-label="Unrolled tape measure in centimeters"></svg>
+</div>
+<label for="measurement">My rounded measurement (whole cm)</label>
+<div class="two"><input id="measurement" type="number" min="0" max="50" step="1" inputmode="numeric" autocomplete="off"><button id="record" class="primary" disabled>Record measurement</button></div>
+<p class="small" id="measureProgress"></p>
+<details><summary>Help me round</summary><p>Look at the first digit after the decimal point. If it is 5 or more, round up. If it is less than 5, round down.</p><p>Example: 6.4 cm → 6 cm. 6.5 cm → 7 cm.</p><p>We round the model's distance, so small differences can become ties in the table.</p></details>
+</div>
+<div id="mathPanel" hidden>
+<p>Use the two measurements you recorded. The model uses <strong>8 years</strong> between the two stages.</p>
+<div class="galaxies" id="mathChoices" role="group" aria-label="Choose a galaxy to calculate"></div>
+<div class="note" id="mathData"></div>
+<p class="small">Use these formulas in order. Keep up to 3 decimal places. The last two answers are extra distance traveled at the same rate.</p>
+<div class="two">
+<div><label for="math0">1. Change (cm)</label><p class="small">30 cm-stage distance − 20 cm-stage distance</p><input id="math0" type="number" step="any" inputmode="decimal"></div>
+<div><label for="math1">2. Model rate (cm/year)</label><p class="small">Change ÷ 8</p><input id="math1" type="number" step="any" inputmode="decimal"></div>
+<div><label for="math2">3. Motion in 24 years (cm)</label><p class="small">Rate × 24</p><input id="math2" type="number" step="any" inputmode="decimal"></div>
+<div><label for="math3">4. Motion in 32 years (cm)</label><p class="small">Rate × 32</p><input id="math3" type="number" step="any" inputmode="decimal"></div>
+</div>
+<button id="saveMath" class="primary" style="margin-top:18px">Check and save this row</button>
+<p class="small" id="mathProgress"></p>
+<details open><summary>Calculator</summary>
+<div class="calculator">
+<div><label for="calcA">First number</label><input id="calcA" type="number" step="any" inputmode="decimal"></div>
+<div><label for="calcOp">Sign</label><select id="calcOp" aria-label="Calculator operation"><option value="-">−</option><option value="/">÷</option><option value="*">×</option><option value="+">+</option></select></div>
+<div><label for="calcB">Second number</label><input id="calcB" type="number" step="any" inputmode="decimal"></div>
+</div><div class="actions" style="margin-top:12px"><button id="calculate">Calculate</button><output id="calcResult" aria-live="polite">Result appears here.</output></div>
+</details>
+<details><summary>Show a practice example</summary><p>This example is separate from your data.</p><p>If the distances were 12 cm and 20 cm:</p><p>Change = 20 − 12 = <strong>8 cm</strong><br>Rate = 8 ÷ 8 = <strong>1 cm/year</strong><br>Motion in 24 years = 1 × 24 = <strong>24 cm</strong><br>Motion in 32 years = 1 × 32 = <strong>32 cm</strong></p></details>
+</div>
+<div id="explainPanel" hidden>
+<p>Use your table and graph below. You may type, use your device's dictation, or tell your teacher your answers.</p>
+<label>1. As the balloon grew, the galaxies became…</label>
+<div id="observationChoices" class="choice-list" role="group" aria-label="Observed change in distance">
+<button data-observation="farther">Farther apart</button><button data-observation="closer">Closer together</button><button data-observation="same">The same distance apart</button>
+</div>
+<label for="claim">2. What pattern do you see?</label><textarea id="claim" maxlength="2000" placeholder="Galaxies that started farther from A usually had a ___ model rate."></textarea>
+<label for="evidence">3. Use two galaxies as evidence.</label><textarea id="evidence" maxlength="2000" placeholder="Galaxy ___ started at ___ cm and had a rate of ___ cm/year. Galaxy ___ started at ___ cm and had a rate of ___ cm/year."></textarea>
+<label for="reasoning">4. Why did the distances change?</label><textarea id="reasoning" maxlength="2000" placeholder="The dots became farther apart because the balloon's surface ___."></textarea>
+<div class="note"><strong>Connect to real evidence</strong><p>Light from most distant galaxies is shifted toward longer, redder wavelengths. Together with distance measurements, this supports a pattern: more distant galaxies generally recede faster. Our balloon models that pattern; it does not measure light.</p></div>
+<label for="connection">5. How does the model help explain an expanding universe?</label><textarea id="connection" maxlength="2000" placeholder="The growing surface models ___. Both the model and galaxy observations show ___."></textarea>
+<label for="limitation">6. What is one limit of this model?</label><textarea id="limitation" maxlength="2000" placeholder="The model cannot show ___, or differs from the real universe because ___."></textarea>
+<details><summary>Words and ideas to help</summary><p><strong>Expand:</strong> grow so distances increase.<br><strong>Rate:</strong> change in distance for each unit of time.<br><strong>Evidence:</strong> data that support an explanation.<br><strong>Model:</strong> a useful representation with limits.</p><p>The universe has three dimensions of space. This lab uses a two-dimensional surface. A is a chosen reference point; it is not the center of the universe. The balloon's inside and outside are not parts of the analogy.</p><p>The fixed-size markers help track positions. Real galaxies do not inflate like the balloon. The model does not show cosmic microwave background radiation, early hydrogen and helium, or gravitationally bound systems.</p></details>
+<div class="report-tools"><button id="finish" class="primary">Check my report</button><p id="completion" role="status"></p></div>
+</div>
+<div id="feedback" role="status" aria-live="polite">Start by adding the galaxy markers.</div>
+<div class="next-row"><button id="back" hidden>← Back</button><button id="next" class="primary" disabled>Next: inflate to 20 cm →</button></div>
+</section>
+</div>
+<section class="panel sheet" aria-labelledby="dataHeading">
+<p class="eyebrow">Your evidence</p><h2 id="dataHeading">Measurements &amp; patterns</h2>
+<p class="small">All values are measurements or calculations from this virtual model. A dash means you have not recorded that value.</p>
+<div class="scroll" id="tableWrap" tabindex="0" role="region" aria-label="Your lab data table, scroll sideways for more columns"></div>
+<div class="graph-wrap"><h3>Does a farther galaxy have a faster model rate?</h3><p class="small">Horizontal axis: starting distance from A. Vertical axis: model rate. Points appear as you save calculation rows.</p><svg id="graph" viewBox="0 0 720 400" role="img" aria-labelledby="graphTitle graphDesc"></svg></div>
+</section>
+<details>
+<summary>Save or hand in your work</summary>
+<p><strong>Your work stays in this browser.</strong> It is not sent to a teacher or server. On a shared device, save a work file and then use Start over when you are finished.</p>
+<ul><li><strong>Save work file</strong> lets you resume on another device using Open work file.</li><li><strong>Download report</strong> saves a readable HTML notebook you can open, print, or share with your teacher.</li><li><strong>Print / PDF</strong> opens your browser's print dialog. Choose Save as PDF if available.</li><li><strong>Download data</strong> saves a CSV file for a spreadsheet.</li></ul>
+<div class="actions"><button id="report">Download report</button><button id="print">Print / PDF</button><button id="csv">Download data (CSV)</button></div>
+</details>
+<details>
+<summary>For the teacher · key, sources &amp; lab use</summary>
+<p>Designed for one student with no physical supplies. Offer read-aloud directions, short sessions, a calculator, and oral responses as appropriate. Save the student's own observations and reasoning.</p>
+<p><a href="https://github.com/jplutajr/earth-science-labs/blob/main/docs/TEACHER_GUIDE.md" target="_blank" rel="noopener">Open the teacher guide and answer key ↗</a></p>
+<p>This is an independent digital balloon-model adaptation. It supports part of NYSSLS / NGSS HS-ESS1-2. The teacher and school determine whether the completed work meets their laboratory requirements. It is not a state-approved replacement for required NYS science investigations.</p>
+<ul class="sources">
+<li><a href="https://www.jpl.nasa.gov/edu/resources/lesson-plan/model-the-expanding-universe/" target="_blank" rel="noopener">NASA / JPL: Model the Expanding Universe ↗</a></li>
+<li><a href="https://www.nextgenscience.org/pe/hs-ess1-2-earths-place-universe" target="_blank" rel="noopener">NGSS: HS-ESS1-2 ↗</a></li>
+<li><a href="https://www.nysed.gov/standards-instruction/science-faq" target="_blank" rel="noopener">NYSED: Science FAQ and laboratory guidance ↗</a></li>
+</ul>
+</details>
+<footer>Earth Science Labs · Balloon model v1.0 · No account needed. No student responses are uploaded. <a href="https://github.com/jplutajr/earth-science-labs" target="_blank" rel="noopener">Code &amp; future labs ↗</a></footer>
+</main>
+<div id="printArea"></div>
+</body></html>

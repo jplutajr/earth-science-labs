@@ -1,0 +1,32 @@
+name: Lab checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test tools
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Check model
+        run: npm run test:model
+      - name: Check student workflow and layout
+        run: npm run test:browser
+      - name: Save browser review artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-review
+          path: test-results/
+          retention-days: 7
