@@ -1,12 +1,12 @@
 (function teacherMain(){
 "use strict";
-const $=id=>document.getElementById(id),M=window.BalloonModel,config=window.CLASSROOM_CONFIG;
+const $=id=>document.getElementById(id),M=window.BalloonModel,R=window.BalloonReview,config=window.CLASSROOM_CONFIG;
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>Number.isFinite(n)?String(Number(n.toFixed(3))):"—";
 if(!window.ClassroomClient.configured(config)){$("teacherGateMessage").textContent="Classroom accounts are not connected yet. The teacher dashboard will open here after setup.";return;}
 const api=new window.ClassroomClient(config);
 if(!api.session){location.replace("classroom.html");return;}
-let classroom=null,students=[],selected="",guideStep=0,poll=null,busy=false,closed=false;
+let classroom=null,students=[],selected="",guideStep=0,poll=null,busy=false,closed=false,renderedWork="";
 const steps=[
  {title:"1 · Predict",say:"The balloon's surface stands for space. The dots stand for galaxies. We will measure from galaxy A.",do:["Have her add the ten markers.","Ask whether distances will increase, decrease, or stay the same.","Read the sentence starter. Let her explain her own prediction."],look:"Any reasoned prediction is acceptable. Do not require a correct prediction before she collects evidence.",help:"Point to two dots. Ask: “What might happen to the space between them when the surface grows?”"},
  {title:"2 · Measure at 20 cm",say:"The balloon is 20 centimeters across. Our tape follows its curved surface from A to each other galaxy.",do:["Select galaxy B and press Lay measuring tape.","Have her read the number and round to a whole centimeter.","She types the rounded number and presses Record.","Repeat for C–J. All nine values should be recorded."],look:"B 3 · C 5 · D 7 · E 9 · F 11 · G 13 · H 15 · I 18 · J 22 cm.",help:"For B the tape reads 3.2 cm. Ask: “Is the decimal digit less than 5?” Use the separate rounding example before telling a lab answer."},
@@ -24,18 +24,40 @@ function key(){
 }
 function showStudent(){
  const row=students.find(s=>s.student_id===selected);$("teacherDownload").disabled=!row?.state;
+ const signature=JSON.stringify([selected,row?.state,row?.updated_at]);
+ if(!row?.state){renderedWork="";$("reviewAnnouncement").textContent="";}
  if(!row){$("liveProgress").innerHTML="<p>Add her account below. She will appear after it is registered and ready to sign in.</p>";$("progressStatus").textContent="No student selected.";return;}
  if(!row.state){$("liveProgress").innerHTML="<p>No work saved yet. Her first saved entry will appear here.</p>";$("progressStatus").textContent="Waiting for her first notebook.";return;}
  let s;try{s=M.restore(row.state);}catch(e){$("liveProgress").textContent="This notebook uses an unsupported version.";return;}
  const explanations=M.ANSWERS.filter(k=>s.answers[k].trim()).length;
  const time=new Date(row.updated_at);$("progressStatus").textContent=`Last saved: ${Number.isNaN(time.getTime())?"unknown":time.toLocaleString()} · Last open step: ${(Number.isInteger(row.state.phase)?row.state.phase:s.phase)+1}`;
- const labels={observation:"Observation",claim:"Claim / pattern",evidence:"Two galaxies as evidence",reasoning:"Why distances changed",connection:"Connection to the universe",limitation:"A model limitation"};
+ if(signature===renderedWork)return;
+ const labels=R.labels,review=R.review(s);
  const obs={farther:"Farther apart",closer:"Closer together",same:"The same distance apart"};
- let html=`<div class="metrics"><div class="metric"><strong>${M.count(s,20)+M.count(s,30)}/18</strong>measurements</div><div class="metric"><strong>${Object.keys(s.math).length}/9</strong>calculation rows</div><div class="metric"><strong>${explanations}/6</strong>explanations</div></div><h3>Prediction</h3><p>${esc(s.prediction||"Not answered")}<br>${esc(s.why||"No reason entered yet.")}</p><div class="scroll" tabindex="0" role="region" aria-label="Student measurements"><table><caption>${esc(row.display_name)} · saved values</caption><thead><tr><th>Galaxy</th><th>First cm</th><th>Second cm</th><th>Change cm</th><th>Rate cm/year</th><th>24 years cm</th><th>32 years cm</th></tr></thead><tbody>`;
- for(const id of M.TARGETS)html+=`<tr><th scope="row">${id}</th>${[s.measurements[20][id],s.measurements[30][id],...(s.math[id]||Array(4).fill(undefined))].map(n=>`<td>${fmt(n)}</td>`).join("")}</tr>`;
- html+="</tbody></table></div><h3 style='margin-top:24px'>Her explanations</h3>";
- html+=M.ANSWERS.map(k=>`<div class="student-answer"><strong>${labels[k]}</strong><p>${esc((k==="observation"?obs[s.answers[k]]:s.answers[k])||"Not answered yet.")}</p></div>`).join("");
+ const count=review.flags.length,summary=count?`${count} ${count===1?"item":"items"} to review`:"No automatic flags right now";
+ let html=`<div class="review-summary ${count?"has-flags":""}" aria-labelledby="reviewTitle"><p class="eyebrow">Teacher view only</p><h3 id="reviewTitle">${count?"! ":""}${summary}</h3><p class="small">Red marks a number to check or wording to discuss. Drafts may still be changing. Written checks can miss mistakes or flag valid wording; you decide what is accurate.</p>`;
+ if(count)html+=`<ul class="review-links">${review.flags.map(f=>`<li><a href="#${f.id}">${esc(f.title)}</a> — ${esc(f.kind==="writing"?"Review wording":f.kind==="choice"?"Check choice":"Check number")}</li>`).join("")}</ul>`;
+ else html+="<p class='small'>Keep reviewing her explanations. A response without a flag is not automatically correct.</p>";
+ html+=`</div><div class="metrics"><div class="metric"><strong>${M.count(s,20)+M.count(s,30)}/18</strong>measurements</div><div class="metric"><strong>${Object.keys(s.math).length}/9</strong>calculation rows</div><div class="metric"><strong>${explanations}/6</strong>explanations</div></div><h3>Prediction</h3><p>${esc(s.prediction||"Not answered")}<br>${esc(s.why||"No reason entered yet.")}</p><p class="small">Predictions are not marked wrong. Use her measurements to revisit her thinking.</p><h3>Her numbers</h3><p class="small">Draft = her current entry, before Record or Check and save. Blank boxes are not flagged. A flag clears when the latest saved entry matches the expected value.</p><div class="scroll" id="studentData" tabindex="0" role="region" aria-label="Student measurements and calculation drafts"><table><caption>${esc(row.display_name)} · recorded values and current drafts</caption><thead><tr><th>Galaxy</th><th>First cm</th><th>Second cm</th><th>Change cm</th><th>Rate cm/year</th><th>24 years cm</th><th>32 years cm</th></tr></thead><tbody>`;
+ function cell(c){
+  return `<td id="${c.id}" tabindex="-1" class="${c.issue?"needs-review":""}"><span class="entry-value">${esc(c.value||"—")}</span>${c.draft?'<span class="entry-label">Draft</span>':""}${c.draft&&c.saved!==undefined?`<span class="entry-label">Recorded: ${fmt(c.saved)}</span>`:""}${c.issue?`<span class="review-badge">! Check number</span><span class="entry-label">${esc(c.issue.message)}</span>`:""}</td>`;
+ }
+ for(const id of M.TARGETS)html+=`<tr><th scope="row">${id}</th>${[review.measurements[20][id],review.measurements[30][id],...review.math[id]].map(cell).join("")}</tr>`;
+ html+="</tbody></table></div>";
+ const numberFlags=review.flags.filter(f=>f.kind==="number");
+ if(numberFlags.length)html+=`<div class="review-prompts"><h3>Help with these numbers</h3>${numberFlags.map(f=>`<p><strong>${esc(f.title)}:</strong> ${esc(f.hint)}</p>`).join("")}</div>`;
+ html+="<h3 style='margin-top:24px'>Her explanations</h3>";
+ html+=M.ANSWERS.map(k=>{
+  const issue=review.answers[k];
+  return `<div id="review-answer-${k}" tabindex="-1" class="student-answer ${issue?"needs-review":""}"><strong>${labels[k]}</strong><p class="student-response">${esc((k==="observation"?obs[s.answers[k]]:s.answers[k])||"Not answered yet.")}</p>${issue?`<div class="review-note"><span class="review-badge">! ${k==="observation"?"Check choice":"Review wording"}</span><p>${esc(issue.message)}</p><p><strong>Try asking:</strong> ${esc(issue.hint)}</p></div>`:""}</div>`;
+ }).join("");
+ const scrollLeft=$("studentData")?.scrollLeft||0,focused=document.activeElement?.id;
  $("liveProgress").innerHTML=html;
+ renderedWork=signature;
+ $("studentData").scrollLeft=scrollLeft;
+ if(focused?.startsWith("review-"))$(focused)?.focus({preventScroll:true});
+ const announcement=summary+". Updated from her saved work.";
+ if($("reviewAnnouncement").textContent!==announcement)$("reviewAnnouncement").textContent=announcement;
 }
 async function refresh(){
  if(busy||closed)return;busy=true;

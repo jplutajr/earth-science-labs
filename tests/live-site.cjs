@@ -2,7 +2,7 @@
 const fs=require("node:fs/promises"),assert=require("node:assert/strict"),{chromium}=require("@playwright/test");
 (async()=>{
  const base="https://jplutajr.github.io/earth-science-labs/";
- const paths=["index.html","assets/model.js","assets/app.js","assets/styles.css","classroom.html","teacher.html","assets/classroom-config.js","assets/classroom.js","assets/classroom-client.js","assets/login.js","assets/teacher.js"];
+ const paths=["index.html","assets/model.js","assets/app.js","assets/styles.css","classroom.html","teacher.html","assets/classroom-config.js","assets/classroom.js","assets/classroom-client.js","assets/login.js","assets/teacher.js","assets/review.js","assets/classroom.css"];
  const expected=Object.fromEntries(await Promise.all(paths.map(async p=>[p,await fs.readFile(p,"utf8")])));
  let ready=false,last="";
  for(let attempt=0;attempt<24;attempt++){

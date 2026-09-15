@@ -33,10 +33,11 @@ npm install --ignore-scripts --no-audit --no-fund
 npx playwright install --with-deps chromium
 npm run test:model
 npm run test:auth
+npm run test:review
 npm run test:browser
 ```
 
-Model tests check geodesic measurements, scaling, rounding, calculations, and safe state restoration. Browser tests complete the lab, reject incomplete entries, exercise downloads and reopening work, confirm math edits invalidate saved results, and check keyboard access and mobile overflow. Pushes to main also verify the deployed HTML, scripts, and styles against the current commit and complete a measurement on the live site. Screenshots are saved as test artifacts. Browser test logs also include small visual-review images without student information.
+Model tests check geodesic measurements, scaling, rounding, calculations, and safe state restoration. Review tests cover numeric drafts, possible written misconceptions, negations, evidence values, and compatibility with earlier notebooks. Classroom browser tests verify teacher-only flags and corrections with separate mock teacher/student accounts; no real student records are used. Browser tests complete the lab, reject incomplete entries, exercise downloads and reopening work, confirm math edits invalidate saved results, and check keyboard access and mobile overflow. Pushes to main also verify the deployed HTML, scripts, and styles against the current commit and complete a measurement on the live site. Screenshots are saved as test artifacts. Browser test logs also include small visual-review images without student information.
 
 The GitHub workflow also runs the migration and access checks against a disposable PostgreSQL service. To run those checks locally, apply the files in backend/tests/bootstrap.sql, backend/001_classroom.sql, then backend/tests/access.sql to a dedicated disposable database; never run the test bootstrap against production.
 
@@ -48,6 +49,7 @@ Before classroom use, open the site on the school's actual browser and try a mea
 - `assets/styles.css`: responsive styles and print layout.
 - `assets/model.js`: pure geometry, calculations, state schema.
 - `assets/app.js`: interactions, SVG drawing, local save, reports.
+- `assets/review.js`: local teacher review rules; never writes student work.
 - `tests/`: model and browser checks.
 - `docs/`: adult guidance and extension plan.
 
