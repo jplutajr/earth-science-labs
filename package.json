@@ -6,7 +6,8 @@
   "scripts": {
     "test:model": "node --test tests/model.test.cjs",
     "test:browser": "playwright test",
-    "test:auth": "node --test tests/auth.test.cjs"
+    "test:auth": "node --test tests/auth.test.cjs",
+    "test:review": "node --test tests/review.test.cjs"
   },
   "devDependencies": {
     "@playwright/test": "1.55.1"

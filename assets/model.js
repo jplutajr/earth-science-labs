@@ -23,7 +23,7 @@
     return [change,rate,rate*24,rate*32];
   }
   function fresh(){return {version:LAB.version,protocol:LAB.protocol,started:new Date().toISOString(),
-    phase:0,marked:false,student:"",prediction:"",why:"",measurements:{20:{},30:{}},math:{},draftMath:{},
+    phase:0,marked:false,student:"",prediction:"",why:"",measurements:{20:{},30:{}},draftMeasurements:{20:{},30:{}},math:{},draftMath:{},
     answers:Object.fromEntries(ANSWERS.map(k=>[k,""]))};}
   const count=(s,d)=>Object.keys(s.measurements[d]).length;
   function unlocked(s){
@@ -40,6 +40,8 @@
     for(const d of [20,30])for(const id of TARGETS){
       const n=raw.measurements?.[d]?.[id];
       if(Number.isInteger(n)&&n===nearest(distance(d,id)))s.measurements[d][id]=n;
+      // Optional v1 draft data. Never replace a recorded measurement with an attempt.
+      if(typeof raw.draftMeasurements?.[d]?.[id]==="string")s.draftMeasurements[d][id]=text(raw.draftMeasurements[d][id],30);
     }
     for(const id of TARGETS){
       const a=s.measurements[20][id],b=s.measurements[30][id],row=raw.math?.[id];

@@ -102,7 +102,7 @@ function measurementView(){
  $("layTape").textContent=`Lay measuring tape: A → ${selected}`;
  $("readingLabel").textContent=`Surface distance from A to ${selected}`;
  $("reading").textContent=tape?`${distance(d,selected).toFixed(1)} cm`:"Lay the tape to measure.";
- $("measurement").value=state.measurements[d][selected]??"";
+ $("measurement").value=state.draftMeasurements[d][selected]??state.measurements[d][selected]??"";
  $("record").disabled=!tape;
  $("measureProgress").textContent=`${count(state,d)} of 9 measurements recorded at this stage. A check mark means recorded.`;
  ruler();
@@ -166,7 +166,7 @@ function recordMeasurement(){
  const d=phaseDiameter(),n=numberFrom($("measurement").value),correct=nearest(distance(d,selected));
  if(n===null||!Number.isInteger(n)){announce("Type a whole number before recording. Use the tape reading to round.",true);return;}
  if(n!==correct){announce(`Check your rounding. The tape reads ${distance(d,selected).toFixed(1)} cm. Look at the digit after the decimal point.`,true);return;}
- const old=selected;state.measurements[d][old]=n;save();overview();nav();
+ const old=selected;state.measurements[d][old]=n;delete state.draftMeasurements[d][old];save();overview();nav();
  const next=TARGETS.find(id=>state.measurements[d][id]===undefined);
  if(next){selected=next;tape=false;}
  sphere();measurementView();
@@ -174,6 +174,10 @@ function recordMeasurement(){
  (next?$("layTape"):$("next")).focus({preventScroll:true});
 }
 $("record").addEventListener("click",recordMeasurement);
+$("measurement").addEventListener("input",()=>{
+ state.draftMeasurements[phaseDiameter()][selected]=$("measurement").value.slice(0,30);
+ save();
+});
 $("measurement").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();recordMeasurement();}});
 for(let i=0;i<4;i++)$("math"+i).addEventListener("input",()=>{
  state.draftMath[selected]=[0,1,2,3].map(j=>$("math"+j).value);

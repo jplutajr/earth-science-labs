@@ -18,9 +18,9 @@ Directions are divided into short steps. Students get a readable tape, rounding 
 
 ## Teacher and student accounts
 
-[Classroom sign in](https://jplutajr.github.io/earth-science-labs/classroom.html) supports Google sign-in and separate lab-password accounts after backend setup. The teacher dashboard contains progress, responses, the guide, and a control to send students to a selected step. Students reopen their own saved work.
+[Classroom sign in](https://jplutajr.github.io/earth-science-labs/classroom.html) supports Google sign-in and separate lab-password accounts after backend setup. The teacher dashboard contains progress, responses, the guide, and a control to send students to a selected step. Red review flags identify incorrect numeric drafts and selected possible misconceptions in written answers, with expected values and help prompts. Flags update with saved work and appear only on the teacher side. They do not change answers, grades, or completed progress. Written checks are suggestions for teacher review, not automatic grading. Students reopen their own saved work.
 
-**Connection status:** the site is connected to a Supabase Free-plan project, the classroom database is installed, and the approved teacher email is registered privately. Google provider setup and the first real-account sign-in are still pending. The sign-in page checks provider availability and displays the Google button once enabled. See [classroom setup](docs/CLASSROOM_SETUP.md). Guests can continue using the practice lab.
+**Connection status:** the site is connected to a Supabase Free-plan project, the classroom database is installed, and the approved teacher email is registered privately. The sign-in page checks provider availability and displays the Google button when enabled. See [classroom setup](docs/CLASSROOM_SETUP.md). Guests can continue using the practice lab.
 
 **Budget: $0.** Keep GitHub Pages and Supabase on their free plans. No paid upgrades, custom domains, or add-ons are needed for this implementation. Free-plan limits and inactivity pauses still apply; see [Supabase pricing](https://supabase.com/pricing).
 

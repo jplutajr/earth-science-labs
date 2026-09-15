@@ -33,6 +33,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Check model
         run: npm run test:model
+      - name: Check teacher review rules and notebook compatibility
+        run: npm run test:review
       - name: Check authentication client
         run: npm run test:auth
       - name: Check classroom database permissions
