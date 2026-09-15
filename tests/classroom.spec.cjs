@@ -153,6 +153,61 @@ test("teacher sees a rejected measurement draft while the prior recorded value s
  expect(b.records.student.state.measurements[20].B).toBe(3);expect(b.records.student.state.draftMeasurements[20].B).toBeUndefined();
  await tc.close();await sc.close();
 });
+test("time instructions preserve saved answers and drafts across reload while monitoring and new saves continue",async({browser},testInfo)=>{
+ const b=backend();b.cls.current_phase=3;
+ const s=M.fresh();s.student="Student 01";s.marked=true;s.phase=3;s.prediction="increase";s.why="The surface will stretch.";
+ for(const id of M.TARGETS){for(const d of[20,30])s.measurements[d][id]=M.nearest(M.distance(d,id));s.math[id]=M.calculateRow(s.measurements[20][id],s.measurements[30][id]);}
+ delete s.math.B;s.draftMath.B=["9",".25","6","8"];s.draftMeasurements[20].C="99";
+ s.answers={observation:"closer",claim:"Farther galaxies have smaller rates.",evidence:"Galaxy B started at 3 cm.",reasoning:"The surface stretched.",connection:"Space expands.",limitation:"The surface is 2D."};
+ const original=JSON.parse(JSON.stringify(s));b.records.student={state:s,revision:500,updated_at:new Date().toISOString()};
+ const tc=await browser.newContext(),sc=await browser.newContext();await b.attach(tc);await b.attach(sc);
+ const teacher=await tc.newPage(),student=await sc.newPage();await login(teacher,"teacher");
+ await expect(teacher.locator("#reviewTitle")).toContainText("4 items to review");
+ expect(b.records.student.state).toEqual(original);expect(b.records.student.revision).toBe(500);
+ await login(student,"student");await expect(student.locator("#cloudStatus")).toContainText("Saved to your classroom");
+ expect(b.records.student.state).toEqual(original);
+ await student.reload();await expect(student.locator("#cloudStatus")).toContainText("Saved to your classroom");
+ expect(b.records.student.state).toEqual(original);
+ await expect(student.locator("#math0")).toHaveValue("9");
+ for(const [key,value] of Object.entries(original.answers))if(key!=="observation")await expect(student.locator("#"+key)).toHaveValue(value);
+ await expect(student.locator('[data-observation="closer"]')).toHaveAttribute("aria-pressed","true");
+ await expect(student.locator("#mathData")).toContainText("First Measurement — Year 0");
+ await expect(student.locator("#mathData")).toContainText("Second Measurement — Year 8");
+ await expect(student.locator("#mathData")).toContainText("Time passed = 8 model years");
+ await expect(student.locator(".rate-rule")).toContainText("Change ÷ Time = Rate");
+ await expect(student.locator("#rateInstruction")).toHaveText("Step 2: Change ÷ 8 years = Rate");
+ await expect(student.locator("#prediction24Instruction")).toHaveText("Rate × 24 years = predicted change after 24 years");
+ await student.locator("#mathPanel").scrollIntoViewIfNeeded();await student.screenshot({path:testInfo.outputPath("model-time-desktop.png")});
+ await student.locator('#mathChoices [data-galaxy="J"]').click();await expect(student.locator("#mathData")).toContainText("First distance: 22 cm");
+ await expect(student.locator("#mathData")).toContainText("Time passed = 8 model years");await expect(student.locator("#math1")).toHaveValue("1.25");
+ await student.locator('#mathChoices [data-galaxy="B"]').click();await expect(student.locator("#mathData")).toContainText("First distance: 3 cm");
+ await student.locator("#math0").fill("2");await student.locator("#saveMath").click();
+ await expect(teacher.locator("#review-math-B-0")).not.toHaveClass(/needs-review/,{timeout:12000});
+ await expect(teacher.locator("#reviewTitle")).toContainText("3 items to review");
+ await expect(teacher.locator("#review-measure-20-C")).toHaveClass(/needs-review/);
+ await expect(teacher.locator("#review-answer-claim")).toHaveClass(/needs-review/);
+ expect(b.records.student.state.answers).toEqual(original.answers);
+ expect(b.records.student.state.measurements).toEqual(original.measurements);
+ expect(b.records.student.state.draftMeasurements).toEqual(original.draftMeasurements);
+ expect(b.records.student.state.math.B).toEqual([2,.25,6,8]);
+ await student.reload();await expect(student.locator("#math1")).toHaveValue("0.25");await expect(student.locator("#math2")).toHaveValue("6");
+ await student.setViewportSize({width:390,height:844});await student.locator("#mathPanel").scrollIntoViewIfNeeded();
+ expect(await student.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
+ await student.screenshot({path:testInfo.outputPath("model-time-mobile.png")});
+ await student.locator("#changeInstruction").scrollIntoViewIfNeeded();await student.screenshot({path:testInfo.outputPath("model-rate-mobile.png")});
+ // Longer explanations must not widen the existing horizontally scrollable table.
+ const widths=await student.evaluate(()=>{
+  const table=document.querySelector("#tableWrap table"),current=table.scrollWidth,head=table.tHead.innerHTML;
+  table.tHead.innerHTML='<tr><th>Galaxy</th><th>At 20 cm<br>diameter (cm)</th><th>At 30 cm<br>diameter (cm)</th><th>Change<br>(cm)</th><th>Model rate<br>(cm/year)</th><th>Motion in<br>24 years (cm)</th><th>Motion in<br>32 years (cm)</th></tr>';
+  const previous=table.scrollWidth;table.tHead.innerHTML=head;return {current,previous};
+ });
+ expect(widths.current).toBeLessThanOrEqual(widths.previous);
+ await student.locator('[data-phase="1"]').click();await expect(student.locator("#measurePanel .model-time")).toContainText("First Measurement — Year 0");
+ await student.locator('#measureChoices [data-galaxy="C"]').click();await expect(student.locator("#measurement")).toHaveValue("99");
+ await expect(student.locator("#measurePanel .model-time")).toContainText("Second Measurement — Year 8");
+ await expect(student.locator("#measurePanel .model-time")).toContainText("Time passed = 8 model years");
+ await tc.close();await sc.close();
+});
 test("account switch isolates notebooks and sign-out removes the device draft",async({browser})=>{
  const b=backend();b.cls.current_phase=1;b.cls.phase_revision=1;
  const c=await browser.newContext();await b.attach(c);const p=await c.newPage();await login(p,"student");

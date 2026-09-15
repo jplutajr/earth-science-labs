@@ -110,7 +110,7 @@ function measurementView(){
 function mathView(){
  choices("mathChoices",true);
  const a=state.measurements[20][selected],b=state.measurements[30][selected];
- $("mathData").innerHTML=`<strong>Galaxy ${selected}</strong><br>First distance: <strong>${fmt(a)} cm</strong> &nbsp; Second distance: <strong>${fmt(b)} cm</strong><br>Model time: <strong>8 years</strong>`;
+ $("mathData").innerHTML=`<strong>Galaxy ${selected}</strong><p>First Measurement — Year 0<br>First distance: <strong>${fmt(a)} cm</strong></p><p>Second Measurement — Year 8<br>Second distance: <strong>${fmt(b)} cm</strong></p><p class="time-passed">Year 0 → Year 8<br><strong>Time passed = 8 model years</strong></p>`;
  const missing=a===undefined||b===undefined;$("saveMath").disabled=missing;
  if(missing)$("mathData").innerHTML+="<p>Record both measurements for this galaxy in Steps 2 and 3 before checking this row.</p>";
  const row=state.draftMath[selected]||state.math[selected]||["","","",""];
@@ -118,7 +118,7 @@ function mathView(){
  $("mathProgress").textContent=`${Object.keys(state.math).length} of 9 calculation rows saved. Changing a saved row means you must check and save it again.`;
 }
 function tableMarkup(){
- return `<table><caption>Distances measured along the balloon's surface from A</caption><thead><tr><th scope="col">Galaxy</th><th scope="col">At 20 cm<br>diameter (cm)</th><th scope="col">At 30 cm<br>diameter (cm)</th><th scope="col">Change<br>(cm)</th><th scope="col">Model rate<br>(cm/year)</th><th scope="col">Motion in<br>24 years (cm)</th><th scope="col">Motion in<br>32 years (cm)</th></tr></thead><tbody>`+TARGETS.map(id=>`<tr><th scope="row">${id}</th><td>${fmt(state.measurements[20][id])}</td><td>${fmt(state.measurements[30][id])}</td>${[0,1,2,3].map(i=>`<td>${fmt(state.math[id]?.[i])}</td>`).join("")}</tr>`).join("")+"</tbody></table>";
+ return `<table><caption>Distances measured along the balloon's surface from A · Time passed = 8 model years</caption><thead><tr><th scope="col">Galaxy</th><th scope="col">First<br>Measurement<br>— Year 0<br>20 cm balloon<br>(cm)</th><th scope="col">Second<br>Measurement<br>— Year 8<br>30 cm balloon<br>(cm)</th><th scope="col">Change<br>(cm)</th><th scope="col">Rate<br>(Change ÷<br>8 years)<br>(cm/year)</th><th scope="col">Predicted<br>change after<br>24 years (cm)</th><th scope="col">Predicted<br>change after<br>32 years (cm)</th></tr></thead><tbody>`+TARGETS.map(id=>`<tr><th scope="row">${id}</th><td>${fmt(state.measurements[20][id])}</td><td>${fmt(state.measurements[30][id])}</td>${[0,1,2,3].map(i=>`<td>${fmt(state.math[id]?.[i])}</td>`).join("")}</tr>`).join("")+"</tbody></table>";
 }
 function graphMarkup(){
  const rows=TARGETS.filter(id=>state.math[id]),xMax=25,yMax=1.5,x=n=>85+n/xMax*590,y=n=>325-n/yMax*270;
